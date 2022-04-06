@@ -53,8 +53,8 @@ showPiece :: Maybe Piece -> String
 showPiece (Just a) = show a
 showPiece Nothing  = "_"
 
-tupleFromRank :: String -> Maybe (Int, Int)
-tupleFromRank xs =
+tupleFromCoords :: String -> Maybe (Int, Int)
+tupleFromCoords xs =
     case maybeFromRank xs of
         Nothing               -> Nothing
         Just (Nothing, _)     -> Nothing
@@ -66,22 +66,33 @@ tupleFromRank xs =
             | length ys /= 2 = Nothing
             | otherwise = Just (elemIndex (last ys) rankNumbers, elemIndex (head ys) fileLetters)
 
-editSlot :: Board -> (Int, Int) -> Maybe Piece -> Board
-editSlot (Board b) (r,f) p =
-    let (lb,rn:rb) = splitAt r b
-        (lr,fn:rr) = splitAt f rn
-    in Board (lb ++ (lr ++ p : rr) : rb)
+editSlot :: (Int, Int) -> Maybe Piece -> Board -> Board
+editSlot (r,f) p (Board xs) = Board (lb ++ (ls ++ p : rs) : rb) where
+    (lb, rn:rb) = splitAt r xs
+    (ls, fn:rs) = splitAt f rn
+
+moveSlot :: (Int, Int) -> (Int, Int) -> Board -> Board
+moveSlot (r,f) c2 (Board b) = editSlot (r,f) Nothing $ editSlot c2 (b !! r !! f) (Board b)
 
 blankBoard :: Board
-blankBoard = Board $ replicate 8 $ replicate 8 $ Nothing
-
-stringToBoard :: String -> Board
-stringToBoard xs = Board $ map (\Piece) (lines xs)
+blankBoard = Board $ replicate 8 $ replicate 8 Nothing
 
 startBoard :: Board
-startBoard = unlines [ "♜♞♝♝♞♜"
-                     , "♟♟♟♟♟♟♟♟"
-                     ]
+startBoard =
+    -- Black major pieces
+    editSlot (0,0) (Just $ Rook Black) $ editSlot (0,1) (Just $ Knight Black) $ editSlot (0,2) (Just $ Bishop Black) $ editSlot (0,3) (Just $ Queen Black) $
+    editSlot (0,4) (Just $ King Black) $ editSlot (0,5) (Just $ Bishop Black) $ editSlot (0,6) (Just $ Knight Black) $ editSlot (0,7) (Just $ Rook  Black) $
+    -- Black pawns
+    editSlot (1,0) (Just $ Pawn Black) $ editSlot (1,1) (Just $ Pawn   Black) $ editSlot (1,2) (Just $ Pawn   Black) $ editSlot (1,3) (Just $ Pawn  Black) $
+    editSlot (1,4) (Just $ Pawn Black) $ editSlot (1,5) (Just $ Pawn   Black) $ editSlot (1,6) (Just $ Pawn   Black) $ editSlot (1,7) (Just $ Pawn  Black) $
+    -- White major pieces
+    editSlot (7,0) (Just $ Rook White) $ editSlot (7,1) (Just $ Knight White) $ editSlot (7,2) (Just $ Bishop White) $ editSlot (7,3) (Just $ Queen White) $
+    editSlot (7,4) (Just $ King White) $ editSlot (7,5) (Just $ Bishop White) $ editSlot (7,6) (Just $ Knight White) $ editSlot (7,7) (Just $ Rook  White) $
+    -- White pawns
+    editSlot (6,0) (Just $ Pawn White) $ editSlot (6,1) (Just $ Pawn   White) $ editSlot (6,2) (Just $ Pawn   White) $ editSlot (6,3) (Just $ Pawn  White) $
+    editSlot (6,4) (Just $ Pawn White) $ editSlot (6,5) (Just $ Pawn   White) $ editSlot (6,6) (Just $ Pawn   White) $ editSlot (6,7) (Just $ Pawn  White) $
+
+    blankBoard
 
 main :: IO ()
 main = undefined
