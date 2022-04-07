@@ -6,6 +6,7 @@ import Data.Maybe
 data Color
     = White
     | Black
+    deriving Eq
 
 data Piece
     = Pawn   Color
@@ -14,6 +15,7 @@ data Piece
     | Bishop Color
     | Queen  Color
     | King   Color
+    deriving Eq
 
 instance Show Piece where
     show (Pawn   White) = "♙"
@@ -93,6 +95,22 @@ startBoard =
     editSlot (6,4) (Just $ Pawn White) $ editSlot (6,5) (Just $ Pawn   White) $ editSlot (6,6) (Just $ Pawn   White) $ editSlot (6,7) (Just $ Pawn  White) $
 
     blankBoard
+
+isOfType :: Maybe Piece -> (Color -> Piece) -> Bool
+isOfType p t = p == (Just $ t White) || p == (Just $ t Black)
+
+isMoveLegal :: (Int, Int) -> (Int, Int) -> Board -> Bool
+isMoveLegal (r,f) (r2,f2) (Board b)
+    | any (< 0) [r, f, r2, f2] = False
+    | any (> 7) [r, f, r2, f2] = False
+    | piece `isOfType` Rook   && r == r2 || f == f2 = True
+    | piece `isOfType` Bishop && abs (r - r2) == abs (f - f2) = True
+    | piece `isOfType` Queen  && r == r2 || f == f2 || abs (r - r2) == abs (f - f2) = True
+    | piece == (Just $ Pawn White) && r - 1 == r2 && f == f2 = True
+    | piece == (Just $ Pawn Black) && r + 1 == r2 && f == f2 = True
+    | otherwise = False
+    where
+        piece = b !! r !! f :: Maybe Piece
 
 main :: IO ()
 main = undefined
