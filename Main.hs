@@ -75,6 +75,7 @@ coordFromTuple (row, col) = (file, rank) where
         5 -> F
         6 -> G
         7 -> H
+        _ -> error "invalid file"
 
 pieceAt :: Coord -> Board -> Maybe Piece
 pieceAt c (Board b) = b !! row !! col where (row, col) = tupleFromCoord c
