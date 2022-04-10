@@ -158,5 +158,9 @@ isMoveLegal c1 c2 b
                          || (pieceAt c2 b /= Nothing && row2 == row - 1 && abs (col2 - col) == 1)
                          && row /= row2
 
+        -- function to check for obstructions
+        isObstructed :: Coord -> Coord -> (Int, Int) -> Board -> Bool
+        isObstructed c1 c2 (x, y) (Board b) = undefined
+
 main :: IO ()
 main = undefined
