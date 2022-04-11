@@ -92,9 +92,27 @@ startBoard =
 isOfType :: Maybe Piece -> (Color -> Piece) -> Bool
 isOfType p t = p == Just (t White) || p == Just (t Black)
 
+isWhite :: Maybe Piece -> Bool
+isWhite (Just (Pawn   White)) = True
+isWhite (Just (Rook   White)) = True
+isWhite (Just (Knight White)) = True
+isWhite (Just (Bishop White)) = True
+isWhite (Just (Queen  White)) = True
+isWhite (Just (King   White)) = True
+isWhite _                     = False
+
+isBlack :: Maybe Piece -> Bool
+isBlack (Just (Pawn   Black)) = True
+isBlack (Just (Rook   Black)) = True
+isBlack (Just (Knight Black)) = True
+isBlack (Just (Bishop Black)) = True
+isBlack (Just (Queen  Black)) = True
+isBlack (Just (King   Black)) = True
+isBlack _                     = False
+
 isMoveLegal :: Coord -> Coord -> Board -> Bool
-isMoveLegal (row, col) (row2, col2) b
-    | any (< 0) [row, col, row2, col2] || any (> 7) [row, col, row2, col2] = False
+isMoveLegal (file, rank) (file2, rank2) b
+    | any (< 0) [file, rank, file2, rank2] || any (> 7) [file, rank, file2, rank2] = False
     | piece `isOfType` Rook      && canRookMove      = True
     | piece `isOfType` Bishop    && canBishopMove    = True
     | piece `isOfType` Queen     && canQueenMove     = True
@@ -104,35 +122,38 @@ isMoveLegal (row, col) (row2, col2) b
     | piece == Just (Pawn Black) && canBlackPawnMove = True
     | otherwise = False
     where
-        piece = pieceAt (row, col) b
-
-        slotPiece :: (Int, Int) -> Maybe Piece
-        slotPiece c = pieceAt c b
+        piece = pieceAt (file, rank) b
 
         canRookMove :: Bool
-        canRookMove = row == row2 || col == col2 && (row, col) /= (row2, col2)
+        canRookMove = (file == file2 || rank == rank2) && (file, rank) /= (file2, rank2)
 
         canBishopMove :: Bool
-        canBishopMove = abs (row - row2) == abs (col - col2) && (row, col) /= (row2, col2)
+        canBishopMove = abs (file - file2) == abs (rank - rank2) && (file, rank) /= (file2, rank2)
 
         canQueenMove :: Bool
         canQueenMove = canRookMove || canBishopMove
 
         canKnightMove :: Bool
-        canKnightMove = (abs (row2 - row) == 2 && abs (col2 - col) == 1) || (abs (row2 - row) == 1 && abs (col2 - col) == 2)
+        canKnightMove = (abs (file2 - file) == 2 && abs (rank2 - rank) == 1) || (abs (file2 - file) == 1 && abs (rank2 - rank) == 2)
 
         canKingMove :: Bool
-        canKingMove = abs (row2 - row) <= 1 && abs (col2 - col) <= 1 && (row, col) /= (row2, col2)
+        canKingMove = abs (file2 - file) <= 1 && abs (rank2 - rank) <= 1 && (file, rank) /= (file2, rank2)
 
         canWhitePawnMove :: Bool
-        canWhitePawnMove = (row2 - row <= (if col == 2 && slotPiece (row, col + 1) == Nothing then (if slotPiece (row, col + 2) == Nothing then 2 else 1) else 0) && col == col2)
-                         || (pieceAt (row2, col2) b /= Nothing && row2 == row + 1 && abs (col2 - col) == 1)
-                         && row /= row2
-
+        canWhitePawnMove
+            | file == file2 && rank == 1 && rank2 == 3 && pieceAt (file, 2) b == Nothing && pieceAt (file, 3) b == Nothing = True
+            | file == file2 && rank2 == rank + 1 && pieceAt (file, rank + 1) b == Nothing                                  = True
+            | file2 == file + 1 && rank2 == rank + 1 && isBlack (pieceAt (file + 1, rank + 1) b)                           = True
+            | file2 == file - 1 && rank2 == rank + 1 && isBlack (pieceAt (file - 1, rank + 1) b)                           = True
+            | otherwise                                                                                                    = False
+        
         canBlackPawnMove :: Bool
-        canBlackPawnMove = (row - row2 <= (if col == 7 && slotPiece (row, col - 1) == Nothing then (if slotPiece (row, col - 2) == Nothing then 2 else 1) else 0) && col == col2)
-                         || (pieceAt (row2, col2) b /= Nothing && row2 == row - 1 && abs (col2 - col) == 1)
-                         && row /= row2
+        canBlackPawnMove
+            | file == file2 && rank == 6 && rank2 == 4 && pieceAt (file, 5) b == Nothing && pieceAt (file, 4) b == Nothing = True
+            | file == file2 && rank2 == rank - 1 && pieceAt (file, rank - 1) b == Nothing                                  = True
+            | file2 == file + 1 && rank2 == rank - 1 && isWhite (pieceAt (file + 1, rank - 1) b)                           = True
+            | file2 == file - 1 && rank2 == rank - 1 && isWhite (pieceAt (file - 1, rank - 1) b)                           = True
+            | otherwise                                                                                                    = False
 
         -- isObstructed :: Coord -> Coord -> Bool
         -- isObstructed (x, y) (x2, y2)
