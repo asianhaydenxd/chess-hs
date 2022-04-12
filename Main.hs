@@ -31,18 +31,18 @@ instance Show Piece where
 
 type Coord = (Int, Int)
 
-newtype Board = Board [[Maybe Piece]]
+type Board = [[Maybe Piece]]
 
-instance Show Board where
-    show (Board b) = showBoard b where
-        showBoard :: [[Maybe Piece]] -> String
-        showBoard xs
-            | length xs == length b = "  a b c d e f g h  \n" ++ showRank (length xs) (last xs) ++ showBoard (init xs)
-            | null xs               = "  a b c d e f g h  "
-            | otherwise = showRank (length xs) (last xs) ++ showBoard (init xs)
-
-        showRank :: Int -> [Maybe Piece] -> String
-        showRank n rs = show n ++ " " ++ unwords (map showPiece rs) ++ " " ++ show n ++ "\n"
+showBoard :: Board -> String
+showBoard xs = showBoard' xs where
+    showBoard' :: [[Maybe Piece]] -> String
+    showBoard' ys
+        | length ys == length xs = "  a b c d e f g h  \n" ++ showRank (length ys) (last ys) ++ showBoard' (init ys)
+        | null ys                = "  a b c d e f g h  "
+        | otherwise = showRank (length ys) (last ys) ++ showBoard' (init ys)
+        
+    showRank :: Int -> [Maybe Piece] -> String
+    showRank n rs = show n ++ " " ++ unwords (map showPiece rs) ++ " " ++ show n ++ "\n"
 
 showPiece :: Maybe Piece -> String
 showPiece (Just a) = show a
@@ -59,10 +59,10 @@ coord s
         numbers = "12345678" :: String
 
 pieceAt :: Coord -> Board -> Maybe Piece
-pieceAt (row, col) (Board b) = b !! col !! row
+pieceAt (row, col) b = b !! col !! row
 
 editSlot :: Coord -> Maybe Piece -> Board -> Board
-editSlot (file, rank) p (Board b) = Board (ub ++ (lr ++ p : rr) : lb) where
+editSlot (file, rank) p b = (ub ++ (lr ++ p : rr) : lb) where
     (ub, nrow : lb) = splitAt rank b
     (lr, ncol : rr) = splitAt file nrow
 
@@ -70,7 +70,7 @@ moveSlot :: Coord -> Coord -> Board -> Board
 moveSlot c1 c2 b = editSlot c1 Nothing $ editSlot c2 (pieceAt c1 b) b where
 
 blankBoard :: Board
-blankBoard = Board $ replicate 8 $ replicate 8 Nothing
+blankBoard = replicate 8 $ replicate 8 Nothing
 
 startBoard :: Board
 startBoard =
