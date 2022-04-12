@@ -1,9 +1,0 @@
-run = ["runhaskell", "Main.hs"]
-
-entrypoint = "Main.hs"
-
-[languages.haskell]
-pattern = "**/*.hs"
-
-[languages.haskell.languageServer]
-start = ["haskell-language-server", "--lsp"]
