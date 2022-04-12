@@ -35,13 +35,11 @@ type Board = [[Maybe Piece]]
 
 showBoard :: Board -> String
 showBoard xs = showBoard' xs where
-    showBoard' :: [[Maybe Piece]] -> String
     showBoard' ys
         | length ys == length xs = "  a b c d e f g h  \n" ++ showRank (length ys) (last ys) ++ showBoard' (init ys)
         | null ys                = "  a b c d e f g h  "
         | otherwise = showRank (length ys) (last ys) ++ showBoard' (init ys)
         
-    showRank :: Int -> [Maybe Piece] -> String
     showRank n rs = show n ++ " " ++ unwords (map showPiece rs) ++ " " ++ show n ++ "\n"
 
 showPiece :: Maybe Piece -> String
@@ -67,7 +65,7 @@ editSlot (file, rank) p b = (ub ++ (lr ++ p : rr) : lb) where
     (lr, ncol : rr) = splitAt file nrow
 
 moveSlot :: Coord -> Coord -> Board -> Board
-moveSlot c1 c2 b = editSlot c1 Nothing $ editSlot c2 (pieceAt c1 b) b where
+moveSlot c1 c2 b = editSlot c1 Nothing $ editSlot c2 (pieceAt c1 b) b
 
 blankBoard :: Board
 blankBoard = replicate 8 $ replicate 8 Nothing
@@ -125,30 +123,23 @@ isMoveLegal (file, rank) (file2, rank2) b
     where
         piece = pieceAt (file, rank) b
 
-        canRookMove :: Bool
         canRookMove = (file == file2 || rank == rank2) && (file, rank) /= (file2, rank2)
 
-        canBishopMove :: Bool
         canBishopMove = abs (file - file2) == abs (rank - rank2) && (file, rank) /= (file2, rank2)
 
-        canQueenMove :: Bool
         canQueenMove = canRookMove || canBishopMove
 
-        canKnightMove :: Bool
         canKnightMove = (abs (file2 - file) == 2 && abs (rank2 - rank) == 1) || (abs (file2 - file) == 1 && abs (rank2 - rank) == 2)
 
-        canKingMove :: Bool
         canKingMove = abs (file2 - file) <= 1 && abs (rank2 - rank) <= 1 && (file, rank) /= (file2, rank2)
 
-        canWhitePawnMove :: Bool
         canWhitePawnMove
             | file == file2 && rank == 1 && rank2 == 3 && pieceAt (file, 2) b == Nothing && pieceAt (file, 3) b == Nothing = True
             | file == file2 && rank2 == rank + 1 && pieceAt (file, rank + 1) b == Nothing                                  = True
             | file2 == file + 1 && rank2 == rank + 1 && isBlack (pieceAt (file + 1, rank + 1) b)                           = True
             | file2 == file - 1 && rank2 == rank + 1 && isBlack (pieceAt (file - 1, rank + 1) b)                           = True
             | otherwise                                                                                                    = False
-        
-        canBlackPawnMove :: Bool
+
         canBlackPawnMove
             | file == file2 && rank == 6 && rank2 == 4 && pieceAt (file, 5) b == Nothing && pieceAt (file, 4) b == Nothing = True
             | file == file2 && rank2 == rank - 1 && pieceAt (file, rank - 1) b == Nothing                                  = True
@@ -174,7 +165,6 @@ isClear (x, y) (x2, y2) b
     | x2 == x && y2 == y = error "coordinates are identical"
     | otherwise          = error "undetected angle"
     where
-        isClear' :: Coord -> (Int, Int) -> Bool
         isClear' (x2, y2) (xi, yi)
             | isWhite (pieceAt (x, y) b) && isWhite (pieceAt (x2, y2) b) = False -- Check if the checked piece is the same color as the original
             | isBlack (pieceAt (x, y) b) && isBlack (pieceAt (x2, y2) b) = False
