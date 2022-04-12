@@ -155,16 +155,31 @@ isMoveLegal (file, rank) (file2, rank2) b
             | file2 == file - 1 && rank2 == rank - 1 && isWhite (pieceAt (file - 1, rank - 1) b)                           = True
             | otherwise                                                                                                    = False
 
-        -- isObstructed :: Coord -> Coord -> Bool
-        -- isObstructed (x, y) (x2, y2)
-        --     | x == x2 && y > y2 = isObstructed' (x, y) (x2, y2) (0, -1)
-        --     | x == x2 && y < y2 = isObstructed' (x, y) (x2, y2) (0, 1)
-
-        -- isObstructed' :: Coord -> Coord -> (Int, Int) -> Bool
-        -- isObstructed' c (x, y) (xi, yi)
-        --     | pieceAt (x + xi, y + yi) b /= Nothing = True
-        --     | c == (x + xi, y + yi) = False
-        --     | otherwise = isObstructed' c (x + xi, y + yi) (xi, yi)
+isClear :: Coord -> Coord -> Board -> Bool
+isClear (x, y) (x2, y2) b
+    -- Straight lines
+    | x2 == x && y2 < y = isClear' (x2, y2) ( 0,  1)
+    | x2 == x && y2 > y = isClear' (x2, y2) ( 0, -1)
+    | y2 == y && x2 < x = isClear' (x2, y2) ( 1,  0)
+    | y2 == y && x2 > x = isClear' (x2, y2) (-1,  0)
+    -- Perfect Diagonal Check
+    | abs (x2 - x) /= abs (y2 - y) = error "not a valid diagonal"
+    -- Diagonals
+    | x2 >  x && y2 > y = isClear' (x2, y2) (-1, -1)
+    | x2 <  x && y2 > y = isClear' (x2, y2) ( 1, -1)
+    | x2 >  x && y2 < y = isClear' (x2, y2) (-1,  1)
+    | x2 <  x && y2 < y = isClear' (x2, y2) ( 1,  1)
+    -- Strange behavior
+    | x2 == x && y2 == y = error "coordinates are identical"
+    | otherwise          = error "undetected angle"
+    where
+        isClear' :: Coord -> (Int, Int) -> Bool
+        isClear' (x2, y2) (xi, yi)
+            | isWhite (pieceAt (x, y) b) && isWhite (pieceAt (x2, y2) b) = False -- Check if the checked piece is the same color as the original
+            | isBlack (pieceAt (x, y) b) && isBlack (pieceAt (x2, y2) b) = False
+            | (x, y) == (x2 + xi, y2 + yi)                               = True -- Check if the next coordinate is the original
+            | pieceAt (x2 + xi, y2 + yi) b /= Nothing                    = False -- Check if the next coordinate has a piece
+            | otherwise                                                  = isClear' (x2 + xi, y2 + yi) (xi, yi) -- Check next coordinate
 
 main :: IO ()
 main = undefined
