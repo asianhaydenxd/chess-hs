@@ -71,19 +71,13 @@ moveSlot c1 c2 b = editSlot c1 Nothing $ editSlot c2 (pieceAt c1 b) b
 
 -- Game Records
 
-data Capture
-    = NoCapture
-    | Capture
-    | EnPassant
-    deriving Eq
-
 data Promotion
     = NoPromotion
     | Promotion Piece
     deriving Eq
 
 data Move
-    = Move Coord Coord Capture Promotion
+    = Move Coord Coord Promotion
     | WhiteLongCastle
     | WhiteShortCastle
     | BlackLongCastle
@@ -93,7 +87,7 @@ data Move
 type Game = [Move]
 
 isEnPassant :: Move -> Board -> Bool
-isEnPassant (Move (f, r) (f2, r2) c p) b = filesAdjacent && (matchesWhite || matchesBlack) where
+isEnPassant (Move (f, r) (f2, r2) p) b = filesAdjacent && (matchesWhite || matchesBlack) where
     matchesWhite = r == 4 && r2 == 5 && isCurrentPiece (Pawn White) && existsTargetPawn Black
     matchesBlack = r == 3 && r2 == 2 && isCurrentPiece (Pawn Black) && existsTargetPawn White
 
@@ -102,12 +96,12 @@ isEnPassant (Move (f, r) (f2, r2) c p) b = filesAdjacent && (matchesWhite || mat
     filesAdjacent          = abs (f2 - f) == 1
 
 applyMove :: Move -> Board -> Board
-applyMove WhiteLongCastle              b = moveSlot (4,0) (2,0) $ moveSlot (0,0) (3,0) b
-applyMove WhiteShortCastle             b = moveSlot (4,0) (6,0) $ moveSlot (7,0) (5,0) b
-applyMove BlackLongCastle              b = moveSlot (4,7) (2,7) $ moveSlot (0,7) (3,7) b
-applyMove BlackShortCastle             b = moveSlot (4,7) (6,7) $ moveSlot (7,7) (5,7) b
-applyMove (Move c1 c2 c (Promotion p)) b = editSlot c2 (Just p) $ moveSlot c1 c2 b
-applyMove (Move c1 c2 c (NoPromotion)) b = moveSlot c1 c2 b
+applyMove WhiteLongCastle            b = moveSlot (4,0) (2,0) $ moveSlot (0,0) (3,0) b
+applyMove WhiteShortCastle           b = moveSlot (4,0) (6,0) $ moveSlot (7,0) (5,0) b
+applyMove BlackLongCastle            b = moveSlot (4,7) (2,7) $ moveSlot (0,7) (3,7) b
+applyMove BlackShortCastle           b = moveSlot (4,7) (6,7) $ moveSlot (7,7) (5,7) b
+applyMove (Move c1 c2 (Promotion p)) b = editSlot c2 (Just p) $ moveSlot c1 c2 b
+applyMove (Move c1 c2 (NoPromotion)) b = moveSlot c1 c2 b
 
 gameBoard :: Game -> Board
 gameBoard []     = startBoard
