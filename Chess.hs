@@ -71,11 +71,24 @@ moveSlot c1 c2 b = editSlot c1 Nothing $ editSlot c2 (pieceAt c1 b) b
 
 -- Game Records
 
-data Capture = NoCapture | Capture | EnPassant
+data Capture
+    = NoCapture
+    | Capture
+    | EnPassant
+    deriving Eq
 
-data Promotion = NoPromotion | Promotion Piece
+data Promotion
+    = NoPromotion
+    | Promotion Piece
+    deriving Eq
 
-data Move = Move Coord Coord Capture Promotion | WhiteLongCastle | WhiteShortCastle | BlackLongCastle | BlackShortCastle
+data Move
+    = Move Coord Coord Capture Promotion
+    | WhiteLongCastle
+    | WhiteShortCastle
+    | BlackLongCastle
+    | BlackShortCastle
+    deriving Eq
 
 type Game = [Move]
 
