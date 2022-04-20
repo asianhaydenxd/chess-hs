@@ -33,12 +33,20 @@ type Coord = (Int, Int)
 
 type Board = [[Maybe Piece]]
 
+data Capture = NoCapture | Capture | EnPassant
+
+data Promotion = NoPromotion | Promotion Piece
+
+data Move = Move Coord Coord Capture Promotion | WhiteLongCastle | WhiteShortCastle | BlackLongCastle | BlackShortCastle
+
+type Game = [Move]
+
 showBoard :: Board -> String
 showBoard xs = showBoard' xs where
     showBoard' ys
         | length ys == length xs = "  a b c d e f g h  \n" ++ showRank (length ys) (last ys) ++ showBoard' (init ys)
         | null ys                = "  a b c d e f g h  "
-        | otherwise = showRank (length ys) (last ys) ++ showBoard' (init ys)
+        | otherwise              = showRank (length ys) (last ys) ++ showBoard' (init ys)
         
     showRank n rs = show n ++ " " ++ unwords (map showPiece rs) ++ " " ++ show n ++ "\n"
 
