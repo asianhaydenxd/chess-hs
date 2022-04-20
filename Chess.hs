@@ -92,6 +92,15 @@ data Move
 
 type Game = [Move]
 
+isEnPassant :: Move -> Board -> Bool
+isEnPassant (Move (f, r) (f2, r2) c p) b = filesAdjacent && (matchesWhite || matchesBlack) where
+    matchesWhite = r == 4 && r2 == 5 && isCurrentPiece (Pawn White) && existsTargetPawn Black
+    matchesBlack = r == 3 && r2 == 2 && isCurrentPiece (Pawn Black) && existsTargetPawn White
+
+    existsTargetPawn color = pieceAt (f2, r) b == Just (Pawn color)
+    isCurrentPiece p       = pieceAt (f, r) b == Just p
+    filesAdjacent          = abs (f2 - f) == 1
+
 applyMove :: Move -> Board -> Board
 applyMove WhiteLongCastle              b = moveSlot (4,0) (2,0) $ moveSlot (0,0) (3,0) b
 applyMove WhiteShortCastle             b = moveSlot (4,0) (6,0) $ moveSlot (7,0) (5,0) b
