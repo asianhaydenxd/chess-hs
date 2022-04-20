@@ -92,6 +92,13 @@ data Move
 
 type Game = [Move]
 
+applyMove :: Move -> Board -> Board
+applyMove WhiteLongCastle  b = moveSlot (4,0) (2,0) $ moveSlot (0,0) (3,0) b
+applyMove WhiteShortCastle b = moveSlot (4,0) (6,0) $ moveSlot (7,0) (5,0) b
+applyMove BlackLongCastle  b = moveSlot (4,7) (2,7) $ moveSlot (0,7) (3,7) b
+applyMove BlackShortCastle b = moveSlot (4,7) (6,7) $ moveSlot (7,7) (5,7) b
+applyMove (Move c1 c2 c p) b = moveSlot c1 c2 b
+
 -- Base Chess
 
 blankBoard :: Board
