@@ -99,6 +99,10 @@ applyMove BlackLongCastle  b = moveSlot (4,7) (2,7) $ moveSlot (0,7) (3,7) b
 applyMove BlackShortCastle b = moveSlot (4,7) (6,7) $ moveSlot (7,7) (5,7) b
 applyMove (Move c1 c2 c p) b = moveSlot c1 c2 b
 
+gameBoard :: Game -> Board
+gameBoard []     = startBoard
+gameBoard (x:xs) = applyMove x (gameBoard xs)
+
 -- Base Chess
 
 blankBoard :: Board
