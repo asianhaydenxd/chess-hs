@@ -84,6 +84,22 @@ data Move
     | BlackShortCastle
     deriving Eq
 
+instance Show Move where
+    show WhiteLongCastle  = "0-0-0"
+    show BlackLongCastle  = "0-0-0"
+    show WhiteShortCastle = "0-0"
+    show BlackShortCastle = "0-0"
+    show (Move c1 c2 pr)  = (coordString c1) ++ (coordString c2) ++ (if pr == NoPromotion then [] else "=" ++ promoteInit pr) where
+        coordString (f,r) = [letters !! f, numbers !! r]
+        letters = "abcdefgh"
+        numbers = "12345678"
+
+        promoteInit (Promotion (Rook   _)) = "R"
+        promoteInit (Promotion (Knight _)) = "N"
+        promoteInit (Promotion (Bishop _)) = "B"
+        promoteInit (Promotion (Queen  _)) = "Q"
+        promoteInit _ = error "Invalid promotion"
+
 type Game = [Move]
 
 isEnPassant :: Move -> Board -> Bool
