@@ -181,23 +181,17 @@ isMoveLegal (Move (file, rank) (file2, rank2) pr) b
     where
         piece = pieceAt (file, rank) b
 
-        canRookMove = (file == file2 || rank == rank2) && (file, rank) /= (file2, rank2)
-
+        canRookMove   = (file == file2 || rank == rank2) && (file, rank) /= (file2, rank2)
         canBishopMove = abs (file - file2) == abs (rank - rank2) && (file, rank) /= (file2, rank2)
-
-        canQueenMove = canRookMove || canBishopMove
-
+        canQueenMove  = canRookMove || canBishopMove
         canKnightMove = (abs (file2 - file) == 2 && abs (rank2 - rank) == 1) || (abs (file2 - file) == 1 && abs (rank2 - rank) == 2)
-
-        canKingMove = abs (file2 - file) <= 1 && abs (rank2 - rank) <= 1 && (file, rank) /= (file2, rank2)
-
+        canKingMove   = abs (file2 - file) <= 1 && abs (rank2 - rank) <= 1 && (file, rank) /= (file2, rank2)
         canWhitePawnMove
             | file == file2 && rank == 1 && rank2 == 3 && pieceAt (file, 2) b == Nothing && pieceAt (file, 3) b == Nothing = True
             | file == file2 && rank2 == rank + 1 && pieceAt (file, rank + 1) b == Nothing                                  = True
             | file2 == file + 1 && rank2 == rank + 1 && isBlack (pieceAt (file + 1, rank + 1) b)                           = True
             | file2 == file - 1 && rank2 == rank + 1 && isBlack (pieceAt (file - 1, rank + 1) b)                           = True
             | otherwise                                                                                                    = False
-
         canBlackPawnMove
             | file == file2 && rank == 6 && rank2 == 4 && pieceAt (file, 5) b == Nothing && pieceAt (file, 4) b == Nothing = True
             | file == file2 && rank2 == rank - 1 && pieceAt (file, rank - 1) b == Nothing                                  = True
