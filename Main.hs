@@ -30,9 +30,16 @@ inputToMove c s
         pieceToConst 'Q' = Queen
 
 playChess :: IO ()
-playChess = play [] where
-    play :: Game -> IO ()
-    play = undefined
+playChess = play [] White where
+    play :: Game -> Color -> IO ()
+    play g c = do
+        putStrLn $ showBoard $ gameBoard g
+        inputMove <- getLine
+        play (inputToMove c inputMove : g) (swap c)
+    
+    swap :: Color -> Color
+    swap White = Black
+    swap Black = White
 
 main :: IO ()
 main = playChess
