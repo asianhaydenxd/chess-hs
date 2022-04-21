@@ -166,8 +166,8 @@ isBlack (Just (Queen  Black)) = True
 isBlack (Just (King   Black)) = True
 isBlack _                     = False
 
-isMoveLegal :: Coord -> Coord -> Board -> Bool
-isMoveLegal (file, rank) (file2, rank2) b
+isMoveLegal :: Move -> Board -> Bool
+isMoveLegal (Move (file, rank) (file2, rank2) pr) b
     | any (< 0) [file, rank, file2, rank2] || any (> 7) [file, rank, file2, rank2] = False
     | not $ isClear (file, rank) (file2, rank2) b    = False
     | piece `isOfType` Rook      && canRookMove      = True
