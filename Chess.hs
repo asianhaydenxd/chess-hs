@@ -41,7 +41,7 @@ showBoard xs = showBoard' xs where
         | length ys == length xs = "  a b c d e f g h  \n" ++ showRank (length ys) (last ys) ++ showBoard' (init ys)
         | null ys                = "  a b c d e f g h  "
         | otherwise              = showRank (length ys) (last ys) ++ showBoard' (init ys)
-        
+
     showRank n rs = show n ++ " " ++ unwords (map showPiece rs) ++ " " ++ show n ++ "\n"
 
 showPiece :: Maybe Piece -> String
@@ -51,8 +51,8 @@ showPiece Nothing  = "_"
 coord :: String -> Coord
 coord s
     | length s /= 2 = error ""
-    | not $ head s `elem` letters = error ""
-    | not $ last s `elem` numbers = error ""
+    | head s `notElem` letters = error ""
+    | last s `notElem` numbers = error ""
     | otherwise = (\f (a1, a2) -> (f a1, f a2)) fromJust (elemIndex (head s) letters, elemIndex (last s) numbers)
     where
         letters = "abcdefgh" :: String
